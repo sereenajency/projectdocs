@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interior Furniture Modeling App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f2f2f2; /* Neutral base color */
+            color: #333;
+        }
+        h1 {
+            color: #3498db; /* Accent color */
+        }
+        p {
+            color: #555;
+        }
+        #imageUpload {
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px solid #90caf9; /* Lighter, cooler blue as an accent */
+            background-color: #fafafa; /* Slightly lighter neutral color for input background */
+            color: #333;
+            border-radius: 5px;
+        }
+        #stylePrompt {
+            margin: 10px 0;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 2px solid #90caf9; /* Lighter, cooler blue as an accent */
+            background-color: #fafafa; /* Slightly lighter neutral color for input background */
+            color: #333;
+            border-radius: 5px;
+        }
+        #generateButton {
+            background-color: #1565c0; /* Dark blue */
+            color: #fff;
+            padding: 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        #uploadedImageContainer {
+            margin: 20px 0;
+        }
+        #loadingSymbol {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Interior Furniture Modeling App!</h1>
+    <p>Select an image of your room and choose a category. Enter your preferred style below:</p>
+
+    <input type="file" id="imageUpload" accept="image/*">
+    <select id="category">
+        <option value="kitchen">Kitchen</option>
+        <option value="living-room">Living Room</option>
+        <!-- Add more options for other categories -->
+    </select>
+    
+    <textarea id="stylePrompt" placeholder="Enter your preferred style as a prompt"></textarea>
+
+    <button id="generateButton" onclick="submitForm()">Generate</button>
+    <div id="loadingSymbol"></div>
+
+    <div id="uploadedImageContainer">
+        <h3>Input Image</h3>
+        <img id="inputImage" alt="Input Image">
+        <h3>Generated Image</h3>
+        <img id="generatedImage" alt="Generated Image">
+    </div>
+
+    <script>
+        function submitForm() {
+            const file = document.getElementById('imageUpload').files[0];
+            const category = document.getElementById('category').value;
+            const stylePrompt = document.getElementById('stylePrompt').value;
+
+            if (!file) {
+                alert('Please select an image.');
+                return;
+            }
+
+            // Display loading message
+            document.getElementById('loadingSymbol').innerHTML = 'Processing...';
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('category', category);
+            formData.append('stylePrompt', stylePrompt);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display uploaded image
+                document.getElementById('inputImage').src = URL.createObjectURL(file);
+
+                // Display generated image
+                document.getElementById('generatedImage').src = data.imageUrl;
+
+                // Clear loading message
+                document.getElementById('loadingSymbol').innerHTML = '';
+            })
+            .catch(error => {
+                console.error('Error uploading image:', error);
+                document.getElementById('loadingSymbol').innerHTML = 'Error processing image';
+            });
+        }
+    </script>
+</body>
+</html>
