@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomRemix</title>
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to RoomRemix!</h1>
+    <p>Select an image of your room and choose a category. Enter your preferred style below:</p>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="imageUpload" accept="image/*">
+        <select id="category" name="category">
+            <option value="kitchen">Kitchen</option>
+            <option value="living-room">Living Room</option>
+            <option value="bedroom">Bedroom</option>
+            <option value="study-room">Study Room</option>
+            <!-- Add more options for other categories -->
+        </select>
+
+        <textarea id="stylePrompt" name="stylePrompt" placeholder="Enter your preferred style as a prompt"></textarea>
+
+        <button id="generateButton" type="button" onclick="submitForm()">Generate</button>
+    </form>
+
+    <div id="loadingSymbol"></div>
+
+    <div id="uploadedImageContainer">
+        <h3>Input Image</h3>
+        <img id="inputImage" alt="Input Image">
+        <h3>Generated Image</h3>
+        <img id="generatedImage" alt="Generated Image">
+    </div>
+
+    <script>
+        function submitForm() {
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
+
+            // Display loading message
+            document.getElementById('loadingSymbol').innerHTML = 'Processing...';
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Display uploaded image
+                    document.getElementById('inputImage').src = URL.createObjectURL(form['file'].files[0]);
+
+                    // Display generated image
+                    document.getElementById('generatedImage').src = data.imageUrl;
+
+                    // Clear loading message
+                    document.getElementById('loadingSymbol').innerHTML = '';
+                })
+                .catch(error => {
+                    console.error('Error processing image:', error);
+                    document.getElementById('loadingSymbol').innerHTML = 'Error processing image';
+                });
+        }
+    </script>
+</body>
+
+</html>
